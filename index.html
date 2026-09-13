@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계약서 1차 검토 & 협상 코칭</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+    h2 { font-size: 1.2rem; margin: 1rem 0 0.5rem; }
+    .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    label { display: block; font-weight: 600; margin-bottom: 4px; }
+    textarea, select, input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    textarea { min-height: 120px; resize: vertical; }
+    button { background: #007bff; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 8px; }
+    button:hover { background: #0056b3; }
+    button.secondary { background: #6c757d; }
+    button.danger { background: #dc3545; }
+    .banner { padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; font-weight: 600; }
+    .banner-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .banner-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .clause { background: #f8f9fa; padding: 12px; border-radius: 4px; margin-bottom: 8px; }
+    .clause h3 { font-size: 1rem; margin-bottom: 8px; }
+    .tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+    .tag-keep { background: #cce5ff; color: #004085; }
+    .tag-concede { background: #e2e3e5; color: #383d41; }
+    .tag-tradeoff { background: #fff3cd; color: #856404; }
+    .copy-btn { background: #28a745; margin-top: 8px; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .form-group { margin-bottom: 12px; }
+    .hint { font-size: 12px; color: #666; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>계약서 1차 검토 & 협상 코칭</h1>
+    <p class="hint">상대방 계약서가 도착했을 때, 독소조항을 빠르게 확인하고 대응 방향을 정리하세요.</p>
+    
+    <!-- Profile Section -->
+    <div class="card">
+      <h2>내 프로필 (선택)</h2>
+      <div class="form-group">
+        <label>회사명/소속</label>
+        <input type="text" id="companyName" placeholder="예: ㈜ example">
+      </div>
+      <div class="form-group">
+        <label>자주 쓰는 기본 계약 유형</label>
+        <select id="defaultContractType">
+          <option value="">선택 안 함</option>
+          <option value="라이선스">라이선스</option>
+          <option value="NDA">NDA</option>
+          <option value="공동연구개발">공동연구개발</option>
+          <option value="위탁연구개발">위탁연구개발</option>
+          <option value="구매공급">구매공급</option>
+          <option value="용역계약">용역계약</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>기본 내 입장</label>
+        <select id="defaultPosition">
+          <option value="">선택 안 함</option>
+          <option value="IP를 주는 입장">IP를 주는 입장</option>
+          <option value="IP를 받는 입장">IP를 받는 입장</option>
+          <option value="주고받는 입장">주고받는 입장</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>우리 회사의 기본 협상 우려점 메모 (선택)</label>
+        <input type="text" id="defaultConcern" placeholder="예: IP 소유권 사수 우선">
+      </div>
+      <button class="secondary" onclick="saveProfile()">프로필 저장</button>
+      <button class="danger" onclick="resetProfile()">프로필 초기화</button>
+    </div>
+
+    <!-- Input Section -->
+    <div class="card">
+      <h2>계약서 분석 요청</h2>
+      <div class="form-group">
+        <label>계약서 텍스트 (직접 붙여넣기)</label>
+        <textarea id="contractText" placeholder="계약 전문 또는 IP 관련 조항 발췌를 붙여넣으세요."></textarea>
+      </div>
+      <div class="form-group">
+        <label>계약 유형</label>
+        <select id="contractType">
+          <option value="라이선스">라이선스</option>
+          <option value="NDA">NDA</option>
+          <option value="공동연구개발">공동연구개발</option>
+          <option value="위탁연구개발">위탁연구개발</option>
+          <option value="구매공급">구매공급</option>
+          <option value="용역계약">용역계약</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>내 입장</label>
+        <select id="myPosition">
+          <option value="IP를 주는 입장">IP를 주는 입장</option>
+          <option value="IP를 받는 입장">IP를 받는 입장</option>
+          <option value="주고받는 입장">주고받는 입장</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>이번 계약 핵심 우려점 (선택)</label>
+        <input type="text" id="concern" placeholder="예: IP 소유권 사수 우선">
+      </div>
+      <button onclick="analyzeContract()">분석 시작</button>
+    </div>
+
+    <!-- Output Section -->
+    <div id="outputSection" class="section">
+      <div id="dealbreakerBanner"></div>
+      
+      <div class="card">
+        <h2>조항별 분석</h2>
+        <div id="clauseAnalysis"></div>
+      </div>
+
+      <div class="card">
+        <h2>전체 협상 전략 요약</h2>
+        <div id="negotiationStrategy"></div>
+      </div>
+
+      <div class="card">
+        <h2>1-Click Redline</h2>
+        <div id="redlineText"></div>
+        <button class="copy-btn" onclick="copyRedline()">수정 조문 텍스트 복사</button>
+      </div>
+
+      <div class="card">
+        <h2>협상 시뮬레이션</h2>
+        <p>분석 결과를 바탕으로 AI가 상대방 역할을 맡아 반박 메시지를 보내고, 당신의 답장에 대해 피드백과 대안을 제시합니다.</p>
+        <div id="simulationSection">
+          <textarea id="simulationReply" placeholder="상대방의 반박에 대한 당신의 답변을 작성하세요."></textarea>
+          <button onclick="startSimulation()">답변 제출 & 피드백 받기</button>
+        </div>
+        <div id="simulationResult"></div>
+      </div>
+
+      <div class="card">
+        <h2>면책 안내</h2>
+        <p>이 결과는 선행기술 조사 보조 의견이며, 특허성·침해 여부·법률적 판단을 대체하지 않습니다. 실제 효력·해석·관할은 계약 문언과 상황을 함께 본 전문가 검토가 필요합니다.</p>
+        <button class="secondary" onclick="openExpertConnect()">전문가 연결 (변호사/변리사 2차 검토)</button>
+      </div>
+    </div>
+
+    <div id="loadingSection" class="section">
+      <div class="card">
+        <p>분석 중입니다. 잠시만 기다려 주세요.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let config = {};
+
+    async function loadConfig() {
+      try {
+        const response = await fetch('/api/config');
+        config = await response.json();
+      } catch (error) {
+        config.expertConsultLinkUrl = 'https://www.lawtalk.co.kr';
+      }
+    }
+
+    function openExpertConnect() {
+      window.open(config.expertConsultLinkUrl || 'https://www.lawtalk.co.kr', '_blank');
+    }
+
+    window.onload = function() {
+      loadConfig();
+      loadProfile();
+    };
+
+    function saveProfile() {
+      const profile = {
+        companyName: document.getElementById('companyName').value,
+        defaultContractType: document.getElementById('defaultContractType').value,
+        defaultPosition: document.getElementById('defaultPosition').value,
+        defaultConcern: document.getElementById('defaultConcern').value
+      };
+      localStorage.setItem('ipcc_profile', JSON.stringify(profile));
+      alert('프로필이 저장되었습니다.');
+    }
+
+    function loadProfile() {
+      const profile = JSON.parse(localStorage.getItem('ipcc_profile') || '{}');
+      if (profile.companyName) document.getElementById('companyName').value = profile.companyName;
+      if (profile.defaultContractType) document.getElementById('defaultContractType').value = profile.defaultContractType;
+      if (profile.defaultPosition) document.getElementById('defaultPosition').value = profile.defaultPosition;
+      if (profile.defaultConcern) document.getElementById('defaultConcern').value = profile.defaultConcern;
+    }
+
+    function resetProfile() {
+      localStorage.removeItem('ipcc_profile');
+      document.getElementById('companyName').value = '';
+      document.getElementById('defaultContractType').value = '';
+      document.getElementById('defaultPosition').value = '';
+      document.getElementById('defaultConcern').value = '';
+      alert('프로필이 초기화되었습니다.');
+    }
+
+    async function analyzeContract() {
+      const contractText = document.getElementById('contractText').value;
+      const contractType = document.getElementById('contractType').value;
+      const myPosition = document.getElementById('myPosition').value;
+      const concern = document.getElementById('concern').value;
+
+      if (!contractText.trim()) {
+        alert('계약서 텍스트를 입력해 주세요.');
+        return;
+      }
+
+      document.getElementById('outputSection').classList.remove('active');
+      document.getElementById('loadingSection').classList.add('active');
+
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contract_text: contractText,
+            contract_type: contractType,
+            my_position: myPosition,
+            concern: concern
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || '분석 중 오류가 발생했습니다.');
+        }
+
+        displayResults(data);
+      } catch (error) {
+        alert('분석 중 오류가 발생했습니다: ' + error.message);
+      } finally {
+        document.getElementById('loadingSection').classList.remove('active');
+        document.getElementById('outputSection').classList.add('active');
+      }
+    }
+
+    function displayResults(data) {
+      const banner = document.getElementById('dealbreakerBanner');
+      const riskLevel = data.risk_level || '중간';
+      const isDealbreaker = data.is_dealbreaker || false;
+
+      if (isDealbreaker) {
+        banner.className = 'banner banner-danger';
+        banner.innerHTML = `<strong>⚠️ 딜브레이커 감지</strong><br>전체 위험도: <strong>${riskLevel}</strong><br>이 계약은 현재 상태로는 수용이 어려우며 우선 재협상이 필요합니다.`;
+      } else {
+        banner.className = 'banner banner-warning';
+        banner.innerHTML = `<strong>전체 위험도: ${riskLevel}</strong><br>${data.risk_summary || ''}`;
+      }
+
+      const clauseDiv = document.getElementById('clauseAnalysis');
+      if (data.clauses && data.clauses.length > 0) {
+        clauseDiv.innerHTML = data.clauses.map(clause => `
+          <div class="clause">
+            <h3>${clause.title}</h3>
+            <p><strong>쟁점 유형:</strong> ${clause.issue_type || ''}</p>
+            <p><strong>위험 방향:</strong> ${clause.risk_direction || ''}</p>
+            <p><strong>위험도:</strong> ${clause.risk_level || ''}</p>
+            <p><strong>수정안 3단계:</strong></p>
+            <ul>
+              <li><strong>최대이득안:</strong> ${clause.max_benefit || ''}</li>
+              <li><strong>중간 절충안:</strong> ${clause.middle_compromise || ''}</li>
+              <li><strong>최소사수선:</strong> ${clause.minimum_line || ''}</li>
+            </ul>
+            <p><strong>제시 근거:</strong> ${clause.rationale || ''}</p>
+            <p><strong>협상 포인트:</strong> ${clause.negotiation_point || ''}</p>
+            <p><strong>전략 태그:</strong> ${clause.tags ? clause.tags.map(tag => `<span class="tag tag-${tag.toLowerCase().replace(' ', '-')}">${tag}</span>`).join('') : ''}</p>
+          </div>
+        `).join('');
+      } else {
+        clauseDiv.innerHTML = '<p>분석 결과가 없습니다.</p>';
+      }
+
+      document.getElementById('negotiationStrategy').innerHTML = data.negotiation_strategy || '<p>전략 정보가 없습니다.</p>';
+      document.getElementById('redlineText').textContent = data.redline_text || '수정 조문 텍스트가 생성되지 않았습니다.';
+    }
+
+    function copyRedline() {
+      const text = document.getElementById('redlineText').textContent;
+      if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert('수정 조문 텍스트가 클립보드에 복사되었습니다.');
+        }).catch(() => {
+          alert('복사에 실패했습니다.');
+        });
+      } else {
+        alert('복사할 텍스트가 없습니다.');
+      }
+    }
+
+    async function startSimulation() {
+      const reply = document.getElementById('simulationReply').value;
+      if (!reply.trim()) {
+        alert('답변을 작성해 주세요.');
+        return;
+      }
+
+      const analysisData = {
+        clauses: document.getElementById('clauseAnalysis').innerHTML,
+        negotiation_strategy: document.getElementById('negotiationStrategy').innerHTML,
+        risk_level: document.querySelector('#dealbreakerBanner').textContent
+      };
+
+      try {
+        const response = await fetch('/api/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            analysis_data: analysisData,
+            user_reply: reply
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || '시뮬레이션 중 오류가 발생했습니다.');
+        }
+
+        document.getElementById('simulationResult').innerHTML = `
+          <div class="card">
+            <h3>상대방 반박</h3>
+            <p>${data.opponent_rebuttal || ''}</p>
+            <h3>피드백 및 조언</h3>
+            <p>${data.feedback || ''}</p>
+            <h3>다음 대안</h3>
+            <p>${data.alternatives || ''}</p>
+          </div>
+        `;
+      } catch (error) {
+        alert('시뮬레이션 중 오류가 발생했습니다: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

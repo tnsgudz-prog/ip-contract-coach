@@ -1,0 +1,11 @@
+{
+  "name": "ip-contract-coach",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'build done'",
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}
