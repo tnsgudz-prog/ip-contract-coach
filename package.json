@@ -4,8 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "build": "echo 'build done'",
+    "build": "next build",
     "start": "node server.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.21.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
 }
