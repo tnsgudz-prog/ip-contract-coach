@@ -98,6 +98,19 @@ ${user_reply}
       };
     }
 
+    // 피드백/반박/대안이 객체면 문자열로 안전하게 변환
+    if (result.feedback && typeof result.feedback !== 'string') {
+      result.feedback = Object.prototype.toString.call(result.feedback) === '[object Object]'
+        ? Object.entries(result.feedback).map(([k, v]) => `${k}: ${v}`).join(' | ')
+        : String(result.feedback);
+    }
+    if (result.opponent_rebuttal && typeof result.opponent_rebuttal !== 'string') {
+      result.opponent_rebuttal = String(result.opponent_rebuttal);
+    }
+    if (result.alternatives && typeof result.alternatives !== 'string') {
+      result.alternatives = String(result.alternatives);
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
