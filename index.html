@@ -244,7 +244,15 @@
       }
     }
 
-    function displayResults(data) {
+    
+    function renderListText(text) {
+      if (!text) return "";
+      const lines = text.split("\n").map(l => l.trim()).filter(l => l !== "");
+      if (lines.length === 0) return text;
+      return "<ol>" + lines.map(l => "<li>" + l + "</li>").join("") + "</ol>";
+    }
+
+function displayResults(data) {
       const banner = document.getElementById('dealbreakerBanner');
       const riskLevel = data.risk_level || '중간';
       const isDealbreaker = data.is_dealbreaker || false;
@@ -280,7 +288,7 @@
         clauseDiv.innerHTML = '<p>분석 결과가 없습니다.</p>';
       }
 
-      document.getElementById('negotiationStrategy').innerHTML = data.negotiation_strategy || '<p>전략 정보가 없습니다.</p>';
+      document.getElementById('negotiationStrategy').innerHTML = renderListText(data.negotiation_strategy) || '<p>전략 정보가 없습니다.</p>';
       document.getElementById('redlineText').textContent = data.redline_text || '수정 조문 텍스트가 생성되지 않았습니다.';
     }
 
@@ -326,14 +334,17 @@
           throw new Error(data.error || '시뮬레이션 중 오류가 발생했습니다.');
         }
 
+        const safeFeedback = (data.feedback && typeof data.feedback === 'string') ? data.feedback : '';
+        const safeAlternatives = (data.alternatives && typeof data.alternatives === 'string') ? data.alternatives : '';
+        const safeRebuttal = (data.opponent_rebuttal && typeof data.opponent_rebuttal === 'string') ? data.opponent_rebuttal : '';
         document.getElementById('simulationResult').innerHTML = `
           <div class="card">
             <h3>상대방 반박</h3>
-            <p>${data.opponent_rebuttal || ''}</p>
+            <p>${safeRebuttal}</p>
             <h3>피드백 및 조언</h3>
-            <p>${data.feedback || ''}</p>
+            ${renderListText(safeFeedback)}
             <h3>다음 대안</h3>
-            <p>${data.alternatives || ''}</p>
+            ${renderListText(safeAlternatives)}
           </div>
         `;
       } catch (error) {
