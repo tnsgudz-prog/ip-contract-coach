@@ -8,37 +8,36 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
     .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-    h1 { font-size: 1.5rem; margin-bottom: 1rem; }
-    h2 { font-size: 1.2rem; margin: 1rem 0 0.5rem; }
-    .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    label { display: block; font-weight: 600; margin-bottom: 4px; }
-    textarea, select, input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
-    textarea { min-height: 120px; resize: vertical; }
-    button { background: #007bff; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 8px; }
-    button:hover { background: #0056b3; }
-    button.secondary { background: #6c757d; }
-    button.danger { background: #dc3545; }
-    .banner { padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; font-weight: 600; }
+    h1 { font-size: 1.6rem; margin-bottom: 1.2rem; }
+    h2 { font-size: 1.25rem; margin: 1.4rem 0 0.8rem; }
+    .card { background: #fff; border-radius: 10px; padding: 18px; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    textarea, select, input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    .clause { background: #f8f9fa; padding: 16px; border-radius: 6px; margin-bottom: 16px; }
+    .clause h3 { font-size: 1.05rem; margin-bottom: 10px; }
+    .banner { padding: 14px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 600; }
     .banner-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     .banner-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-    .clause { background: #f8f9fa; padding: 12px; border-radius: 4px; margin-bottom: 8px; }
-    .clause h3 { font-size: 1rem; margin-bottom: 8px; }
     .tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 4px; }
     .tag-keep { background: #cce5ff; color: #004085; }
     .tag-concede { background: #e2e3e5; color: #383d41; }
     .tag-tradeoff { background: #fff3cd; color: #856404; }
-    .copy-btn { background: #28a745; margin-top: 8px; }
+    .form-group { margin-bottom: 14px; }
     .section { display: none; }
     .section.active { display: block; }
-    .form-group { margin-bottom: 12px; }
     .hint { font-size: 12px; color: #666; margin-top: 4px; }
-    .redline-box { background: #eaf6ff; border: 1px solid #9cc8ff; border-radius: 6px; padding: 12px; margin: 8px 0 4px; }
-    .redline-box .redline-label { font-weight: 700; color: #0b4a8a; margin-bottom: 6px; }
-    .redline-box .redline-text { white-space: pre-wrap; word-break: break-word; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
-    .redline-options { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #9cc8ff; }
-    .redline-options .opt-title { font-weight: 700; color: #0b4a8a; margin-bottom: 4px; }
-    .redline-options .opt-item { margin: 4px 0; padding-left: 12px; }
-    .redline-copy { background: #0b4a8a; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; }
+    .redline-box { background: #eaf6ff; border: 1px solid #9cc8ff; border-radius: 6px; padding: 14px; margin: 12px 0 10px; }
+    .redline-box .redline-label { font-weight: 700; color: #0b4a8a; margin-bottom: 10px; }
+    .redline-box .redline-text { white-space: pre-wrap; word-break: break-word; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; margin-bottom: 8px; }
+    .redline-row { display: flex; align-items: flex-start; gap: 10px; }
+    .redline-row .redline-text { flex: 1; }
+    .redline-options { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #9cc8ff; }
+    .redline-options .opt-title { font-weight: 700; color: #0b4a8a; margin-bottom: 6px; }
+    .redline-options .opt-item { margin: 6px 0; padding-left: 12px; }
+    .redline-copy { background: #0b4a8a; color: #fff; border: none; padding: 7px 11px; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+    .redline-copy:hover { background: #0a3f6e; }
+    .copy-btn { background: #28a745; padding: 7px 11px; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+    .copy-btn:hover { background: #218838; }
     .risk-easy { color: #7a2e1a; background: #fdf2ec; border: 1px solid #f2c4b0; border-radius: 6px; padding: 10px; margin: 6px 0; }
     .risk-easy .risk-label { font-weight: 700; color: #7a2e1a; }
     .negotiation-easy { color: #1f4e6b; background: #eef6fb; border: 1px solid #b6d6ec; border-radius: 6px; padding: 10px; margin: 6px 0; }
@@ -137,9 +136,11 @@
 
       <div class="card">
         <h2>1-Click Redline (전체)</h2>
-        <div id="redlineText"></div>
+        <div class="redline-row">
+          <div id="redlineText" class="redline-text"></div>
+          <button class="copy-btn" onclick="copyRedline()">전체 Redline 복사</button>
+        </div>
         <div id="redlineOptions"></div>
-        <button class="copy-btn" onclick="copyRedline()">전체 Redline 복사</button>
       </div>
 
       <div class="card">
@@ -291,14 +292,16 @@ function displayResults(data) {
 
             <div class="redline-box">
               <span class="redline-label">1-Click Redline (조항별 · 바로 복사)</span>
-              <div class="redline-text">${clause.redline || '수정 조문 텍스트가 생성되지 않았습니다.'}</div>
+              <div class="redline-row">
+                <div class="redline-text">${clause.redline || '수정 조문 텍스트가 생성되지 않았습니다.'}</div>
+                <button class="redline-copy" onclick="copyClauseRedline(${idx})">이 조항 Redline 복사</button>
+              </div>
               ${clause.redline_options && clause.redline_options.length ? `
                 <div class="redline-options">
                   <div class="opt-title">선택 옵션</div>
-                  ${clause.redline_options.map(opt => `<div class="opt-item">${opt}</div>`).join('')}
+                  ${clause.redline_options.map(opt => `<div class="opt-item">${escapeHtml(opt)}</div>`).join('')}
                 </div>
               ` : ''}
-              <button class="redline-copy" onclick="copyClauseRedline(${idx})">이 조항 Redline 복사</button>
             </div>
 
             <div class="risk-easy">
