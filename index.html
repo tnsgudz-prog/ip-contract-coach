@@ -34,10 +34,31 @@
     .redline-options { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #9cc8ff; }
     .redline-options .opt-title { font-weight: 700; color: #0b4a8a; margin-bottom: 6px; }
     .redline-options .opt-item { margin: 6px 0; padding-left: 12px; }
-    .redline-copy { background: #0b4a8a; color: #fff; border: none; padding: 7px 11px; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap; }
-    .redline-copy:hover { background: #0a3f6e; }
-    .copy-btn { background: #28a745; padding: 7px 11px; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap; }
-    .copy-btn:hover { background: #218838; }
+    .btn {
+      display: inline-block;
+      font-family: inherit;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 15px;
+      transition: transform 0.05s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+      line-height: 1;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .btn:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary { background: #0b4a8a; color: #fff; }
+    .btn-primary:hover { background: #0a3f6e; }
+    .btn-secondary { background: #6b7a8f; color: #fff; }
+    .btn-secondary:hover { background: #58677a; }
+    .btn-copy { background: #28a745; color: #fff; }
+    .btn-copy:hover { background: #218838; }
+    .btn-danger { background: #d93025; color: #fff; }
+    .btn-danger:hover { background: #b3261e; }
     .risk-easy { color: #7a2e1a; background: #fdf2ec; border: 1px solid #f2c4b0; border-radius: 6px; padding: 10px; margin: 6px 0; }
     .risk-easy .risk-label { font-weight: 700; color: #7a2e1a; }
     .negotiation-easy { color: #1f4e6b; background: #eef6fb; border: 1px solid #b6d6ec; border-radius: 6px; padding: 10px; margin: 6px 0; }
@@ -82,8 +103,8 @@
         <label>우리 회사의 기본 협상 우려점 메모 (선택)</label>
         <input type="text" id="defaultConcern" placeholder="예: IP 소유권 사수 우선">
       </div>
-      <button class="secondary" onclick="saveProfile()">프로필 저장</button>
-      <button class="danger" onclick="resetProfile()">프로필 초기화</button>
+      <button class="btn btn-secondary" onclick="saveProfile()">프로필 저장</button>
+      <button class="btn btn-danger" onclick="resetProfile()">프로필 초기화</button>
     </div>
 
     <!-- Input Section -->
@@ -117,7 +138,7 @@
         <label>이번 계약 핵심 우려점 (선택)</label>
         <input type="text" id="concern" placeholder="예: IP 소유권 사수 우선">
       </div>
-      <button onclick="analyzeContract()">분석 시작</button>
+      <button class="btn btn-primary" onclick="analyzeContract()">분석 시작</button>
     </div>
 
     <!-- Output Section -->
@@ -138,7 +159,7 @@
         <h2>1-Click Redline (전체)</h2>
         <div class="redline-row">
           <div id="redlineText" class="redline-text"></div>
-          <button class="copy-btn" onclick="copyRedline()">전체 Redline 복사</button>
+          <button class="btn btn-copy" onclick="copyRedline()">전체 Redline 복사</button>
         </div>
         <div id="redlineOptions"></div>
       </div>
@@ -148,7 +169,7 @@
         <p>분석 결과를 바탕으로 AI가 상대방 역할을 맡아 반박 메시지를 보내고, 당신의 답장에 대해 피드백과 대안을 제시합니다.</p>
         <div id="simulationSection">
           <textarea id="simulationReply" placeholder="상대방의 반박에 대한 당신의 답변을 작성하세요."></textarea>
-          <button onclick="startSimulation()">답변 제출 & 피드백 받기</button>
+          <button class="btn btn-primary" onclick="startSimulation()">답변 제출 & 피드백 받기</button>
         </div>
         <div id="simulationResult"></div>
       </div>
@@ -156,7 +177,7 @@
       <div class="card">
         <h2>면책 안내</h2>
         <p>이 결과는 IP 계약 협상 보조 의견이며, 계약 검토 보조 의견입니다. 법률적 효력·해석·관할 및 침해 여부를 대체하지 않으므로, 실제 계약 체결·이행 전에는 반드시 변호사/변리사의 전문가 검토가 필요합니다.</p>
-        <button class="secondary" onclick="openExpertConnect()">전문가 연결 (변리사/변호사 2차 검토)</button>
+        <button class="btn btn-secondary" onclick="openExpertConnect()">전문가 연결 (변리사/변호사 2차 검토)</button>
       </div>
     </div>
 
@@ -294,7 +315,7 @@ function displayResults(data) {
               <span class="redline-label">1-Click Redline (조항별 · 바로 복사)</span>
               <div class="redline-row">
                 <div class="redline-text">${clause.redline || '수정 조문 텍스트가 생성되지 않았습니다.'}</div>
-                <button class="redline-copy" onclick="copyClauseRedline(${idx})">이 조항 Redline 복사</button>
+                <button class="btn btn-copy" onclick="copyClauseRedline(${idx})">이 조항 Redline 복사</button>
               </div>
               ${clause.redline_options && clause.redline_options.length ? `
                 <div class="redline-options">
