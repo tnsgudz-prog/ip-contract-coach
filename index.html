@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>계약서 1차 검토 & 협상 코칭</title>
+  <title>IP 계약 리스크 검토 & Redline 솔루션</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
@@ -32,12 +32,23 @@
     .section.active { display: block; }
     .form-group { margin-bottom: 12px; }
     .hint { font-size: 12px; color: #666; margin-top: 4px; }
+    .redline-box { background: #eaf6ff; border: 1px solid #9cc8ff; border-radius: 6px; padding: 12px; margin: 8px 0 4px; }
+    .redline-box .redline-label { font-weight: 700; color: #0b4a8a; margin-bottom: 6px; }
+    .redline-box .redline-text { white-space: pre-wrap; word-break: break-word; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+    .redline-options { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #9cc8ff; }
+    .redline-options .opt-title { font-weight: 700; color: #0b4a8a; margin-bottom: 4px; }
+    .redline-options .opt-item { margin: 4px 0; padding-left: 12px; }
+    .redline-copy { background: #0b4a8a; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; }
+    .risk-easy { color: #7a2e1a; background: #fdf2ec; border: 1px solid #f2c4b0; border-radius: 6px; padding: 10px; margin: 6px 0; }
+    .risk-easy .risk-label { font-weight: 700; color: #7a2e1a; }
+    .negotiation-easy { color: #1f4e6b; background: #eef6fb; border: 1px solid #b6d6ec; border-radius: 6px; padding: 10px; margin: 6px 0; }
+    .negotiation-easy .neg-label { font-weight: 700; color: #1f4e6b; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>계약서 1차 검토 & 협상 코칭</h1>
-    <p class="hint">상대방 계약서가 도착했을 때, 독소조항을 빠르게 확인하고 대응 방향을 정리하세요.</p>
+    <h1>IP 계약 리스크 검토 & Redline 솔루션</h1>
+    <p class="hint">계약서 텍스트를 붙여넣으면 바로 IP 위험 조항과 조항 수정안(Redline), 3단계 협상안을 뽑아줍니다. 맹 침해 보증·소유권 이전 조항은 특히 주의해서 보세요.</p>
     
     <!-- Profile Section -->
     <div class="card">
@@ -115,7 +126,7 @@
       <div id="dealbreakerBanner"></div>
       
       <div class="card">
-        <h2>조항별 분석</h2>
+        <h2>조항별 분석 및 Redline</h2>
         <div id="clauseAnalysis"></div>
       </div>
 
@@ -125,9 +136,15 @@
       </div>
 
       <div class="card">
-        <h2>1-Click Redline</h2>
+        <h2>1-Click Redline (전체)</h2>
         <div id="redlineText"></div>
-        <button class="copy-btn" onclick="copyRedline()">수정 조문 텍스트 복사</button>
+        ${data.redline_options && data.redline_options.length ? `
+          <div class="redline-options">
+            <div class="opt-title">전체 선택 옵션</div>
+            ${data.redline_options.map(opt => `<div class="opt-item">${opt}</div>`).join('')}
+          </div>
+        ` : ''}
+        <button class="copy-btn" onclick="copyRedline()">전체 Redline 복사</button>
       </div>
 
       <div class="card">
@@ -267,20 +284,41 @@ function displayResults(data) {
 
       const clauseDiv = document.getElementById('clauseAnalysis');
       if (data.clauses && data.clauses.length > 0) {
-        clauseDiv.innerHTML = data.clauses.map(clause => `
+        clauseDiv.innerHTML = data.clauses.map((clause, idx) => `
           <div class="clause">
-            <h3>${clause.title}</h3>
-            <p><strong>쟁점 유형:</strong> ${clause.issue_type || ''}</p>
-            <p><strong>위험 방향:</strong> ${clause.risk_direction || ''}</p>
-            <p><strong>위험도:</strong> ${clause.risk_level || ''}</p>
-            <p><strong>수정안 3단계:</strong></p>
+            <h3>${clause.title || '조항'}</h3>
+            <p><strong>쟁점 유형:</strong> ${clause.issue_type || ''} &nbsp; <strong>위험 방향:</strong> ${clause.risk_direction || ''} &nbsp; <strong>위험도:</strong> ${clause.risk_level || ''}</p>
+
+            <div class="redline-box">
+              <span class="redline-label">1-Click Redline (조항별 · 바로 복사)</span>
+              <div class="redline-text">${clause.redline || '수정 조문 텍스트가 생성되지 않았습니다.'}</div>
+              ${clause.redline_options && clause.redline_options.length ? `
+                <div class="redline-options">
+                  <div class="opt-title">선택 옵션</div>
+                  ${clause.redline_options.map(opt => `<div class="opt-item">${opt}</div>`).join('')}
+                </div>
+              ` : ''}
+              <button class="redline-copy" onclick="copyClauseRedline(${idx})">이 조항 Redline 복사</button>
+            </div>
+
+            <div class="risk-easy">
+              <span class="risk-label">왜 위험한가 · 쟁점 (쉬운 설명)</span>
+              <div>${clause.risk_explanation || ''}</div>
+            </div>
+
+            <p><strong>수정안 3단계 (실제 전달용 · 엄밀한 용어)</strong></p>
             <ul>
               <li><strong>최대이득안:</strong> ${clause.max_benefit || ''}</li>
               <li><strong>중간 절충안:</strong> ${clause.middle_compromise || ''}</li>
               <li><strong>최소사수선:</strong> ${clause.minimum_line || ''}</li>
             </ul>
+
+            <div class="negotiation-easy">
+              <span class="neg-label">협상 포인트 (쉬운 실무 용어)</span>
+              <div>${clause.negotiation_point || ''}</div>
+            </div>
+
             <p><strong>제시 근거:</strong> ${clause.rationale || ''}</p>
-            <p><strong>협상 포인트:</strong> ${clause.negotiation_point || ''}</p>
             <p><strong>전략 태그:</strong> ${clause.tags ? clause.tags.map(tag => `<span class="tag tag-${tag.toLowerCase().replace(' ', '-')}">${tag}</span>`).join('') : ''}</p>
           </div>
         `).join('');
@@ -296,7 +334,26 @@ function displayResults(data) {
       const text = document.getElementById('redlineText').textContent;
       if (text) {
         navigator.clipboard.writeText(text).then(() => {
-          alert('수정 조문 텍스트가 클립보드에 복사되었습니다.');
+          alert('전체 Redline이 클립보드에 복사되었습니다.');
+        }).catch(() => {
+          alert('복사에 실패했습니다.');
+        });
+      } else {
+        alert('복사할 텍스트가 없습니다.');
+      }
+    }
+
+    function copyClauseRedline(idx) {
+      const clauseCards = document.querySelectorAll('#clauseAnalysis .clause');
+      if (!clauseCards.length) { alert('조항 카드가 없습니다.'); return; }
+      if (idx < 0 || idx >= clauseCards.length) { alert('잘못된 조항 인덱스입니다.'); return; }
+      const card = clauseCards[idx];
+      const redlineTextEl = card.querySelector('.redline-text');
+      if (!redlineTextEl) { alert('해당 조항에 Redline이 없습니다.'); return; }
+      const text = redlineTextEl.textContent;
+      if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert(`조항 "${card.querySelector('h3').textContent || '조항'}"의 Redline이 클립보드에 복사되었습니다.`);
         }).catch(() => {
           alert('복사에 실패했습니다.');
         });
