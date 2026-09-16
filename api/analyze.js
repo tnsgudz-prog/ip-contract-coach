@@ -45,7 +45,7 @@ export async function POST(request) {
 핵심 우려점: ${concern || '없음'}
 
 [출력 형식]
-다음 JSON 형식으로 출력하세요:
+다음 JSON 형식으로 출력하세요. (다른 텍스트 없이 JSON만 출력하세요)
 {
   "risk_level": "높음" | "중간" | "낮음",
   "is_dealbreaker": true | false,
@@ -89,6 +89,61 @@ export async function POST(request) {
 
 `;
 
+    // --- 텍스트 정리 보조 함수 ---
+    function cleanText(s) {
+      if (typeof s !== 'string') return '';
+      let t = s.trim();
+      t = t.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+      t = t.replace(/^#{1,6}\s+/gm, '');
+      t = t.replace(/^[-*+]\s+/gm, '');
+      t = t.replace(/^>\s+/gm, '');
+      t = t.replace(/\.{3,}/g, '…');
+      t = t.replace(/\n{3,}/g, '\n\n').replace(/\n\n+/g, '\n\n');
+      t = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return t;
+    }
+    function extractJsonBlock(text) {
+      if (!text) return null;
+      const jsonBlock = text.match(/```json\s*\n?([\s\S]*?)```/i);
+      if (jsonBlock) return jsonBlock[1].trim();
+      const anyBlock = text.match(/```\s*\n?([\s\S]*?)```/i);
+      if (anyBlock) {
+        const inner = anyBlock[1].trim();
+        if (inner.startsWith('{') || inner.startsWith('[')) return inner;
+      }
+      const brace = text.match(/\{[\s\S]*\}/);
+      return brace ? brace[0] : null;
+    }
+    function normalizeResult(raw) {
+      const base = {
+        risk_level: raw && raw.risk_level ? String(raw.risk_level).trim() : '중간',
+        is_dealbreaker: !!(raw && raw.is_dealbreaker),
+        risk_summary: cleanText(raw && raw.risk_summary || ''),
+        clauses: Array.isArray(raw && raw.clauses) ? raw.clauses : [],
+        negotiation_strategy: cleanText(raw && raw.negotiation_strategy || ''),
+        redline_text: cleanText(raw && raw.redline_text || ''),
+        disclaimer: cleanText(raw && raw.disclaimer || '이 결과는 IP 계약 리스크 검토 보조 의견이며, 법률적 효력·해석·관할을 대체하지 않습니다. 실제 계약 체결 전에는 변호사/변리사의 전문가 검토가 필요합니다.'),
+      };
+      if (base.clauses.length) {
+        base.clauses = base.clauses.map(c => ({
+          title: cleanText(c && c.title || '조항'),
+          issue_type: cleanText(c && c.issue_type || ''),
+          risk_direction: cleanText(c && c.risk_direction || ''),
+          risk_level: String(c && c.risk_level ? c.risk_level : '중간').trim(),
+          risk_explanation: cleanText(c && c.risk_explanation || ''),
+          max_benefit: cleanText(c && c.max_benefit || ''),
+          middle_compromise: cleanText(c && c.middle_compromise || ''),
+          minimum_line: cleanText(c && c.minimum_line || ''),
+          redline: cleanText(c && c.redline || ''),
+          redline_options: Array.isArray(c && c.redline_options) ? c.redline_options.map(cleanText) : [],
+          rationale: cleanText(c && c.rationale || ''),
+          negotiation_point: cleanText(c && c.negotiation_point || ''),
+          tags: Array.isArray(c && c.tags) ? c.tags.map(s => String(s).trim()) : [],
+        }));
+      }
+      return base;
+    }
+
     // Upstage API 호출
     const response = await fetch('https://api.upstage.ai/v1/chat/completions', {
       method: 'POST',
@@ -105,51 +160,35 @@ export async function POST(request) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
-        { error: `Upstage API 오류: ${errorData.error.message || '알 수 없는 오류'}` },
+        { error: `Upstage API 오류: ${errorData.error && errorData.error.message ? errorData.error.message : '알 수 없는 오류'}` },
         { status: response.status }
       );
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
+      ? data.choices[0].message.content
+      : '';
 
-    // JSON 파싱 시도
+    // JSON 파싱 및 필드 정리
     let result;
     try {
-      // JSON만 추출
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        result = JSON.parse(jsonMatch[0]);
+      const jsonCandidate = extractJsonBlock(content);
+      if (jsonCandidate) {
+        result = normalizeResult(JSON.parse(jsonCandidate));
       } else {
-        // JSON이 아니면 전체 텍스트를 사용
-        result = {
-          risk_level: '중간',
-          is_dealbreaker: false,
-          risk_summary: content,
-          clauses: [],
-          negotiation_strategy: content,
-          redline_text: '',
-          disclaimer: '이 결과는 IP 계약 리스크 검토 보조 의견이며, 법률적 효력·해석·관할을 대체하지 않습니다. 실제 계약 체결 전에는 변호사/변리사의 전문가 검토가 필요합니다.'
-        };
+        result = normalizeResult({ risk_level: '중간', is_dealbreaker: false, risk_summary: content, clauses: [], negotiation_strategy: content, redline_text: '', disclaimer: '이 결과는 IP 계약 리스크 검토 보조 의견이며, 법률적 효력·해석·관할을 대체하지 않습니다. 실제 계약 체결 전에는 변호사/변리사의 전문가 검토가 필요합니다.' });
       }
     } catch (e) {
-      result = {
-        risk_level: '중간',
-        is_dealbreaker: false,
-        risk_summary: content,
-        clauses: [],
-        negotiation_strategy: content,
-        redline_text: '',
-        disclaimer: '이 결과는 IP 계약 리스크 검토 보조 의견이며, 법률적 효력·해석·관할을 대체하지 않습니다. 실제 계약 체결 전에는 변호사/변리사의 전문가 검토가 필요합니다.'
-      };
+      result = normalizeResult({ risk_level: '중간', is_dealbreaker: false, risk_summary: content, clauses: [], negotiation_strategy: content, redline_text: '', disclaimer: '이 결과는 IP 계약 리스크 검토 보조 의견이며, 법률적 효력·해석·관할을 대체하지 않습니다. 실제 계약 체결 전에는 변호사/변리사의 전문가 검토가 필요합니다.' });
     }
 
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: '서버 내부 오류: ' + error.message },
+      { error: '서버 내부 오류: ' + (error && error.message ? error.message : '알 수 없는 오류') },
       { status: 500 }
     );
   }

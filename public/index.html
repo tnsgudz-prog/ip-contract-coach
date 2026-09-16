@@ -138,12 +138,7 @@
       <div class="card">
         <h2>1-Click Redline (전체)</h2>
         <div id="redlineText"></div>
-        ${data.redline_options && data.redline_options.length ? `
-          <div class="redline-options">
-            <div class="opt-title">전체 선택 옵션</div>
-            ${data.redline_options.map(opt => `<div class="opt-item">${opt}</div>`).join('')}
-          </div>
-        ` : ''}
+        <div id="redlineOptions"></div>
         <button class="copy-btn" onclick="copyRedline()">전체 Redline 복사</button>
       </div>
 
@@ -173,6 +168,11 @@
 
   <script>
     let config = {};
+
+    function escapeHtml(s) {
+      if (typeof s !== 'string') return '';
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
 
     async function loadConfig() {
       try {
@@ -327,7 +327,14 @@ function displayResults(data) {
       }
 
       document.getElementById('negotiationStrategy').innerHTML = renderListText(data.negotiation_strategy) || '<p>전략 정보가 없습니다.</p>';
-      document.getElementById('redlineText').textContent = data.redline_text || '수정 조문 텍스트가 생성되지 않았습니다.';
+      document.getElementById('redlineText').innerHTML = (data.redline_text || '수정 조문 텍스트가 생성되지 않았습니다.');
+      const redlineOptionsEl = document.getElementById('redlineOptions');
+      if (redlineOptionsEl) {
+        const opts = (Array.isArray(data.redline_options) && data.redline_options.length)
+          ? `<div class="redline-options"><div class="opt-title">전체 선택 옵션</div>${data.redline_options.map(opt => `<div class="opt-item">${escapeHtml(opt)}</div>`).join('')}</div>`
+          : '';
+        redlineOptionsEl.innerHTML = opts;
+      }
     }
 
     function copyRedline() {
